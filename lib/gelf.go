@@ -1,10 +1,10 @@
 package qframe_collector_gelf
 
 import (
-	"log"
-  "net"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"log"
+	"net"
 
 	"github.com/qnib/qframe-types"
 	"github.com/zpatrick/go-config"
@@ -16,15 +16,15 @@ const (
 
 type Plugin struct {
 	QChan qtypes.QChan
-	Cfg config.Config
-	Name string
+	Cfg   config.Config
+	Name  string
 }
 
 func NewPlugin(qChan qtypes.QChan, cfg config.Config, name string) Plugin {
 	return Plugin{
 		QChan: qChan,
-		Cfg: cfg,
-		Name: name,
+		Cfg:   cfg,
+		Name:  name,
 	}
 }
 
@@ -47,7 +47,7 @@ func (p *Plugin) Run() {
 
 	log.Printf("[II] Wait for incomming GELF message")
 	for {
-		n,addr,err := ServerConn.ReadFromUDP(buf)
+		n, addr, err := ServerConn.ReadFromUDP(buf)
 		if err != nil {
 			log.Printf("[EE] %v", err)
 			continue
