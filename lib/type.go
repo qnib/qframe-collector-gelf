@@ -1,5 +1,6 @@
 package qframe_collector_gelf
 
+
 type GelfMsg struct {
   Version string `json:"version"`
   Host string `json:"host"`
@@ -12,5 +13,5 @@ type GelfMsg struct {
   ImageID string `json:"_image_id"` // Not the Digest!
   ImageName string `json:"_image_name"`
   Tag string `json:"_tag"`
-	SourceAddr string
+  SourceAddr string
 }

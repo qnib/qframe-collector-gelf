@@ -3,7 +3,6 @@ package qframe_collector_gelf
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/qnib/qframe-types"
@@ -15,41 +14,37 @@ const (
 )
 
 type Plugin struct {
-	QChan qtypes.QChan
-	Cfg   config.Config
-	Name  string
+	qtypes.Plugin
 }
 
 func NewPlugin(qChan qtypes.QChan, cfg config.Config, name string) Plugin {
 	return Plugin{
-		QChan: qChan,
-		Cfg:   cfg,
-		Name:  name,
+		Plugin: qtypes.NewNamedPlugin(qChan, cfg, name, version),
 	}
 }
 
 func (p *Plugin) Run() {
-	log.Printf("[II] Start GELF collector %s v%s", p.Name, version)
+	p.Log("info", fmt.Sprintf("Start GELF collector %s v%s", p.Name, version))
 	port, _ := p.Cfg.StringOr(fmt.Sprintf("collector.%s.port", p.Name), "12201")
 	/* Lets prepare a address at any address at port 10001*/
 	ServerAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		log.Printf("[EE] %v", err)
+		p.Log("error", fmt.Sprintf("%v", err))
 	}
 	/* Now listen at selected port */
 	ServerConn, err := net.ListenUDP("udp", ServerAddr)
 	if err != nil {
-		log.Printf("[EE] %v", err)
+		p.Log("error", fmt.Sprintf("%v", err))
 	}
 	defer ServerConn.Close()
-	log.Printf("[II] Start GELF server on '%s'", ServerAddr)
+	p.Log("info", fmt.Sprintf("Start GELF server on '%s'", ServerAddr))
 	buf := make([]byte, 1024)
 
-	log.Printf("[II] Wait for incomming GELF message")
+	p.Log("info", fmt.Sprintf("Wait for incomming GELF message"))
 	for {
 		n, addr, err := ServerConn.ReadFromUDP(buf)
 		if err != nil {
-			log.Printf("[EE] %v", err)
+			p.Log("error", fmt.Sprintf("%v", err))
 			continue
 		}
 		qm := qtypes.NewQMsg("collector", p.Name)
@@ -57,6 +52,7 @@ func (p *Plugin) Run() {
 		json.Unmarshal(buf[0:n], &gmsg)
 		gmsg.SourceAddr = addr.String()
 		qm.Msg = gmsg.ShortMsg
+		qm.Data = gmsg
 		p.QChan.Data.Send(qm)
 	}
 }
