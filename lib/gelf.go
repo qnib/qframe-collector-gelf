@@ -11,6 +11,8 @@ import (
 
 const (
 	version = "0.1.0"
+	pluginTyp = "collector"
+
 )
 
 type Plugin struct {
@@ -19,14 +21,14 @@ type Plugin struct {
 
 func NewPlugin(qChan qtypes.QChan, cfg config.Config, name string) Plugin {
 	return Plugin{
-		Plugin: qtypes.NewNamedPlugin(qChan, cfg, name, version),
+		Plugin: qtypes.NewNamedPlugin(qChan, cfg, pluginTyp, name, version),
 	}
 }
 
 func (p *Plugin) Run() {
 	p.Log("info", fmt.Sprintf("Start GELF collector %s v%s", p.Name, version))
-	port, _ := p.Cfg.StringOr(fmt.Sprintf("collector.%s.port", p.Name), "12201")
-	/* Lets prepare a address at any address at port 10001*/
+	port := p.CfgStringOr("port", "12201")
+	/* Lets prepare a address at any address at port 12201*/
 	ServerAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		p.Log("error", fmt.Sprintf("%v", err))
