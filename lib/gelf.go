@@ -12,6 +12,7 @@ import (
 const (
 	version   = "0.1.2"
 	pluginTyp = "collector"
+	pluginPkg = "gelf"
 )
 
 type Plugin struct {
@@ -20,7 +21,7 @@ type Plugin struct {
 
 func NewPlugin(qChan qtypes.QChan, cfg config.Config, name string) Plugin {
 	return Plugin{
-		Plugin: qtypes.NewNamedPlugin(qChan, cfg, pluginTyp, name, version),
+		Plugin: qtypes.NewNamedPlugin(qChan, cfg, pluginTyp, pluginPkg, name, version),
 	}
 }
 
