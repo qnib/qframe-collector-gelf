@@ -50,7 +50,7 @@ func (p *Plugin) Run() {
 			continue
 		}
 		qm := qtypes.NewQMsg("collector", p.Name)
-		gmsg := GelfMsg{}
+		gmsg := qtypes.GelfMsg{}
 		json.Unmarshal(buf[0:n], &gmsg)
 		gmsg.SourceAddr = addr.String()
 		qm.Msg = gmsg.ShortMsg
